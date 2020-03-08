@@ -50,6 +50,7 @@ def get_nums_to_drop(numbers, diceTotal):
         if sum(numsToDropInput) != diceTotal:
             print('Invalid Sum. Try Again.\n')
             continue
+        inList = []
         for num in numsToDropInput:
             if num in numbers:
                 numsToDrop.append(num)
@@ -58,6 +59,12 @@ def get_nums_to_drop(numbers, diceTotal):
                 print(f'There is no {num} available. Try again.\n')
                 loop = True
                 break
+            if num in inList:
+                print('You can not repeat numbers. Try again.\n')
+                loop = True
+                break
+            else:
+                inList.append(num)            
         if loop:
             continue
         return numsToDrop
@@ -88,7 +95,7 @@ while True:
         print(f'End Game.\nPoint Total = {pointSum}\n')
         break
     numbers = get_new_numbers(numbers, numsToDrop)
-    if len(actualNumbers) == 0:
+    if all(i == '_' for i in numbers):
         print_board(numbers)
         print('Congratulations! You shut the box!\n')
         break
