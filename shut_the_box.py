@@ -25,7 +25,7 @@ def roll_dice(actualNumbers):
 
 def check_roll(actualNumbers, diceTotal):
     
-    for i in range(0, len(actualNumbers)+1):
+    for i in range(1, len(actualNumbers)+1):
         for combo in itertools.combinations(actualNumbers, i):
             if sum(combo) == diceTotal:
                 return 'pass', sum(actualNumbers)
@@ -35,7 +35,8 @@ def check_roll(actualNumbers, diceTotal):
 def get_nums_to_drop(numbers, diceTotal):
     
     numsToDrop = []
-    while True:
+    invalid = True
+    while invalid:
 
         numsToDropInput = input('Enter which numbers you would like to drop, separated by a comma:\n>>>')
         try:
@@ -52,22 +53,20 @@ def get_nums_to_drop(numbers, diceTotal):
             continue
         inList = []
         for num in numsToDropInput:
-            if num in numbers:
-                numsToDrop.append(num)
-                loop = False
-            else:
-                print(f'There is no {num} available. Try again.\n')
-                loop = True
-                break
             if num in inList:
                 print('You can not repeat numbers. Try again.\n')
-                loop = True
+                invalid = True
                 break
             else:
                 inList.append(num)            
-        if loop:
-            continue
-        return numsToDrop
+            if num not in numbers:
+                print(f'There is no {num} available. Try again.\n')
+                invalid = True
+                break
+            else:
+                numsToDrop.append(num)
+                invalid = False
+    return numsToDrop
 
 def get_new_numbers(numbers, numsToDrop):
 
