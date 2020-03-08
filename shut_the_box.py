@@ -17,10 +17,10 @@ def roll_dice(actualNumbers):
 
     if max(actualNumbers) <= 6:
         diceTotal = dice1
-        print('Dice 1: {}\n\nTotal: {}\n'.format(dice1, diceTotal))
+        print(f'Dice 1: {dice1}\n\nTotal: {diceTotal}\n')
     else:
         diceTotal = dice1 + dice2
-        print('Dice 1: {}\nDice 2: {}\n\nTotal: {}\n'.format(dice1, dice2, diceTotal))
+        print(f'Dice 1: {dice1}\nDice 2: {dice2}\n\nTotal: {diceTotal}\n')
     return diceTotal
 
 def check_roll(actualNumbers, diceTotal):
@@ -35,33 +35,32 @@ def check_roll(actualNumbers, diceTotal):
 def get_nums_to_drop(numbers, diceTotal):
     
     numsToDrop = []
-
     while True:
 
         numsToDropInput = input('Enter which numbers you would like to drop, separated by a comma:\n>>>')
-
-        if numsToDropInput == '':
-            return False        
         try:
-            if sum(numsToDropInput)!= diceTotal:
-                print('Invalid Sum. Try again\n')
-                continue
-            for num in numsToDropInput:
-                if num not in numbers:
-                    print('There is no {} available. Try again.\n'.format(num))
-                continue
-            numsToDrop = [i for i in numsToDropInput]
-            return numsToDrop
+            if numsToDropInput == '':
+                return False
+            numsToDropInput = numsToDropInput.strip('()')
+            numsToDropInput = numsToDropInput.split(',')
+            numsToDropInput = [int(i) for i in numsToDropInput]
         except:
-            if numsToDropInput != diceTotal or numsToDropInput > 9:
-                print('Invalid Sum. Try again\n')
-                continue
-            elif numsToDropInput not in numbers:
-                print('There is no {} available. Try again.\n'.format(numsToDropInput))
-                continue
+            print('Invalid Input.\n')
+            continue
+        if sum(numsToDropInput) != diceTotal:
+            print('Invalid Sum. Try Again.\n')
+            continue
+        for num in numsToDropInput:
+            if num in numbers:
+                numsToDrop.append(num)
+                loop = False
             else:
-                numsToDrop.append(numsToDropInput)
-                return numsToDrop
+                print(f'There is no {num} available. Try again.\n')
+                loop = True
+                break
+        if loop:
+            continue
+        return numsToDrop
 
 def get_new_numbers(numbers, numsToDrop):
 
@@ -82,9 +81,12 @@ while True:
     diceTotal = roll_dice(actualNumbers)
     resultOfCheck, pointSum = check_roll(actualNumbers, diceTotal)
     if resultOfCheck == 'fail':
-        print('End Game.\nPoint Total = {}\n'.format(pointSum))
+        print(f'End Game.\nPoint Total = {pointSum}\n')
         break
     numsToDrop = get_nums_to_drop(numbers, diceTotal)
+    if not numsToDrop:
+        print(f'End Game.\nPoint Total = {pointSum}\n')
+        break
     numbers = get_new_numbers(numbers, numsToDrop)
     if len(actualNumbers) == 0:
         print_board(numbers)
