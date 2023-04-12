@@ -1,27 +1,51 @@
-from random import randint
+from random import randint, sample
 import itertools
 
-def print_board(numbers):
+DICE_DICT = {
+    1: '\u2680',
+    2: '\u2681',
+    3: '\u2682',
+    4: '\u2683',
+    5: '\u2684',
+    6: '\u2685',
+}
+
+def print_board(numbers, d1, d2):
 
     numbersString = [str(i) for i in numbers]
     divider = '|'
     board = divider.join(numbersString)
-    print('='*19)
-    print('|' + board + '|')
-    print(('='*19))
+    print('|'+'='*19+'|')
+    print('|'+'|'+board+'|'+'|')
+    print('|'+'='*19+'|')
+    d1_row, d2_row = sample(range(0, 3), 2)
+    d1_col, d2_col = sample(range(0, 19), 2)
+    d1_remain = 18-d1_col
+    d2_remain = 18-d2_col
+    for i in range(3):
+        if i == d1_row and d1 != None:
+            print('|' + ' '*d1_col + DICE_DICT[d1] + ' '*d1_remain + '|')
+        if i == d2_row and d2 != None:
+            print('|' + ' '*d2_col + DICE_DICT[d2] + ' '*d2_remain + '|')
+        else:
+            print('|'+' '*19+'|') 
+    print('|'+'='*19+'|')
+    d2_p = d2 if d2 else '-'
+    total = d1+d2 if d2 else d1
+    print(f'  D1:{d1} D2:{d2_p} Total:{total}')
+
 
 def roll_dice(actualNumbers):
 
-    dice1 = randint(1,6)
-    dice2 = randint(1,6)
+    d1 = randint(1,6)
+    d2 = randint(1,6)
 
     if max(actualNumbers) <= 6:
-        diceTotal = dice1
-        print(f'Dice 1: {dice1}\n\nTotal: {diceTotal}\n')
+        diceTotal = d1
+        d2 = None
     else:
-        diceTotal = dice1 + dice2
-        print(f'Dice 1: {dice1}\nDice 2: {dice2}\n\nTotal: {diceTotal}\n')
-    return diceTotal
+        diceTotal = d1 + d2
+    return d1, d2, diceTotal
 
 def check_roll(actualNumbers, diceTotal):
     
@@ -79,23 +103,22 @@ def get_new_numbers(numbers, numsToDrop):
     return newNumbers
 
 numbers = [i for i in range(1,10)]
-print_board(numbers)
 
 while True:
 
     actualNumbers = [i for i in numbers if type(i)==int]
-    diceTotal = roll_dice(actualNumbers)
+    d1, d2, diceTotal = roll_dice(actualNumbers)
+    print_board(numbers, d1, d2)
     resultOfCheck, pointSum = check_roll(actualNumbers, diceTotal)
     if resultOfCheck == 'fail':
-        print(f'End Game.\nPoint Total = {pointSum}\n')
+        print(f'Game Over. Point Total={pointSum}')
         break
     numsToDrop = get_nums_to_drop(numbers, diceTotal)
     if not numsToDrop:
-        print(f'End Game.\nPoint Total = {pointSum}\n')
+        print(f'Game Over. Point Total={pointSum}')
         break
     numbers = get_new_numbers(numbers, numsToDrop)
     if all(i == '_' for i in numbers):
-        print_board(numbers)
-        print('Congratulations! You shut the box!\n')
+        print_board(numbers, None, None)
+        print('Congratulations! You shut the box!')
         break
-    print_board(numbers)
